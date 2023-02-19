@@ -1,4 +1,11 @@
 {
+  "name": "@vault-db/model-checker",
+  "version": "0.0.0",
+  "description": "Automated model checking for VaultDB execution",
+  "homepage": "https://github.com/vault-db/model-checker",
+  "author": "James Coglan <jcoglan@gmail.com>",
+  "license": "MPL-2.0",
+  "private": true,
   "devDependencies": {
     "mocha": "^10.2.0"
   },
