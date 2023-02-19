@@ -82,6 +82,19 @@ describe('Graph', () => {
     ])
   })
 
+  it('orders a top-level update() operation with deferred GET', () => {
+    let list = graph.add([], 'LIST /')
+    let link = graph.add([list], 'LINK / x')
+    let get = graph.add([], 'GET /x')
+    let put = graph.add([get, link], 'PUT /x {}')
+
+    assert.deepEqual(graph.orderings(), [
+      [ 'LIST /', 'LINK / x', 'GET /x', 'PUT /x {}' ],
+      [ 'LIST /', 'GET /x', 'LINK / x', 'PUT /x {}' ],
+      [ 'GET /x', 'LIST /', 'LINK / x', 'PUT /x {}' ]
+    ])
+  })
+
   it('orders a nested update() operation', () => {
     let reads = ['GET /path/x', 'LIST /path/', 'LIST /'].map((action) => {
       return graph.add([], action)
