@@ -45,6 +45,15 @@ describe('Planner', () => {
     assert.equal(_nodes.length, mapping.size)
   }
 
+  describe('clients()', () => {
+    it('returns the IDs of registered clients', () => {
+      planner = new Planner(graph)
+      planner.client('alice').update('/x', () => [])
+      planner.client('bob').remove('/y')
+      assert.deepEqual(planner.clients(), ['alice', 'bob'])
+    })
+  })
+
   describe('update (reads_before_links)', () => {
     beforeEach(() => {
       planner = new Planner(graph, { update: 'reads_before_links' })
