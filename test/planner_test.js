@@ -12,7 +12,6 @@ describe('Planner', () => {
 
   beforeEach(() => {
     graph = new Graph()
-    planner = new Planner(graph)
   })
 
   function arrayEqual (a, b) {
@@ -46,9 +45,13 @@ describe('Planner', () => {
     assert.equal(_nodes.length, mapping.size)
   }
 
-  describe('update_reads_before_links', () => {
+  describe('update (reads_before_links)', () => {
+    beforeEach(() => {
+      planner = new Planner(graph, { update: 'reads_before_links' })
+    })
+
     it('plans a top-level document update', () => {
-      planner.client('A').update_reads_before_links('/x.json', FN)
+      planner.client('A').update('/x.json', FN)
       checkGraph({
         get:  { action: ['A', 'get', '/x.json'], deps: [] },
         list: { action: ['A', 'list', '/'], deps: [] },
@@ -58,7 +61,7 @@ describe('Planner', () => {
     })
 
     it('plans an update in a top-level directory', () => {
-      planner.client('A').update_reads_before_links('/path/x.json', FN)
+      planner.client('A').update('/path/x.json', FN)
       checkGraph({
         get:    { action: ['A', 'get', '/path/x.json'], deps: [] },
 
@@ -73,7 +76,7 @@ describe('Planner', () => {
     })
 
     it('plans an update in a nested directory', () => {
-      planner.client('A').update_reads_before_links('/path/to/x.json', FN)
+      planner.client('A').update('/path/to/x.json', FN)
       checkGraph({
         get:    { action: ['A', 'get', '/path/to/x.json'], deps: [] },
 
@@ -90,9 +93,13 @@ describe('Planner', () => {
     })
   })
 
-  describe('update_get_before_put', () => {
+  describe('update (get_before_put)', () => {
+    beforeEach(() => {
+      planner = new Planner(graph, { update: 'get_before_put' })
+    })
+
     it('plans an update in a top-level directory', () => {
-      planner.client('A').update_get_before_put('/path/x.json', FN)
+      planner.client('A').update('/path/x.json', FN)
       checkGraph({
         list1:  { action: ['A', 'list', '/'], deps: [] },
         link1:  { action: ['A', 'link', '/', 'path/'], deps: ['list1'] },
@@ -106,9 +113,13 @@ describe('Planner', () => {
     })
   })
 
-  describe('remove_unlink_reverse_sequential', () => {
+  describe('remove (unlink_reverse_sequential)', () => {
+    beforeEach(() => {
+      planner = new Planner(graph, { remove: 'unlink_reverse_sequential' })
+    })
+
     it('plans a top-level document deletion', () => {
-      planner.client('B').remove_unlink_reverse_sequential('/y.json')
+      planner.client('B').remove('/y.json')
       checkGraph({
         get:    { action: ['B', 'get', '/y.json'], deps: [] },
         list:   { action: ['B', 'list', '/'], deps: [] },
@@ -118,7 +129,7 @@ describe('Planner', () => {
     })
 
     it('plans a deletion in a nested directory', () => {
-      planner.client('B').remove_unlink_reverse_sequential('/path/to/y.json')
+      planner.client('B').remove('/path/to/y.json')
       checkGraph({
         get:      { action: ['B', 'get', '/path/to/y.json'], deps: [] },
 
@@ -135,9 +146,13 @@ describe('Planner', () => {
     })
   })
 
-  describe('remove_unlink_parallel', () => {
+  describe('remove (unlink_parallel)', () => {
+    beforeEach(() => {
+      planner = new Planner(graph, { remove: 'unlink_parallel' })
+    })
+
     it('plans a deletion in a nested directory', () => {
-      planner.client('B').remove_unlink_parallel('/path/to/y.json')
+      planner.client('B').remove('/path/to/y.json')
       checkGraph({
         get:      { action: ['B', 'get', '/path/to/y.json'], deps: [] },
 
