@@ -13,7 +13,7 @@ describe('Graph', () => {
   it('orders a single action', () => {
     graph.add([], 'a')
 
-    assert.deepEqual(graph.orderings(), [
+    assert.deepEqual(Array.from(graph.orderings()), [
       ['a']
     ])
   })
@@ -22,7 +22,7 @@ describe('Graph', () => {
     graph.add([], 'a')
     graph.add([], 'b')
 
-    assert.deepEqual(graph.orderings(), [
+    assert.deepEqual(Array.from(graph.orderings()), [
       [ 'a', 'b' ],
       [ 'b', 'a' ]
     ])
@@ -32,7 +32,7 @@ describe('Graph', () => {
     let a = graph.add([], 'a')
     graph.add([a], 'b')
 
-    assert.deepEqual(graph.orderings(), [
+    assert.deepEqual(Array.from(graph.orderings()), [
       [ 'a', 'b' ]
     ])
   })
@@ -43,7 +43,7 @@ describe('Graph', () => {
     let c = graph.add([a], 'c')
     let d = graph.add([b, c], 'd')
 
-    assert.deepEqual(graph.orderings(), [
+    assert.deepEqual(Array.from(graph.orderings()), [
       [ 'a', 'b', 'c', 'd' ],
       [ 'a', 'c', 'b', 'd' ]
     ])
@@ -54,7 +54,7 @@ describe('Graph', () => {
       chain.reduce((deps, act) => [graph.add(deps, act)], [])
     }
 
-    assert.deepEqual(graph.orderings(), [
+    assert.deepEqual(Array.from(graph.orderings()), [
       [ 'a', 'b', 'c', 'd', 'e' ],
       [ 'a', 'c', 'b', 'd', 'e' ],
       [ 'a', 'c', 'd', 'b', 'e' ],
@@ -76,7 +76,7 @@ describe('Graph', () => {
     let link = graph.add(reads, 'LINK / x')
     graph.add([link], 'PUT /x {}')
 
-    assert.deepEqual(graph.orderings(), [
+    assert.deepEqual(Array.from(graph.orderings()), [
       [ 'LIST /', 'GET /x', 'LINK / x', 'PUT /x {}' ],
       [ 'GET /x', 'LIST /', 'LINK / x', 'PUT /x {}' ]
     ])
@@ -88,7 +88,7 @@ describe('Graph', () => {
     let get = graph.add([], 'GET /x')
     let put = graph.add([get, link], 'PUT /x {}')
 
-    assert.deepEqual(graph.orderings(), [
+    assert.deepEqual(Array.from(graph.orderings()), [
       [ 'LIST /', 'LINK / x', 'GET /x', 'PUT /x {}' ],
       [ 'LIST /', 'GET /x', 'LINK / x', 'PUT /x {}' ],
       [ 'GET /x', 'LIST /', 'LINK / x', 'PUT /x {}' ]
@@ -104,7 +104,7 @@ describe('Graph', () => {
     })
     graph.add(links, 'PUT /path/x {}')
 
-    assert.deepEqual(graph.orderings(), [
+    assert.deepEqual(Array.from(graph.orderings()), [
       [ 'GET /path/x', 'LIST /path/', 'LIST /', 'LINK /path/ x', 'LINK / path/', 'PUT /path/x {}' ],
       [ 'GET /path/x', 'LIST /path/', 'LIST /', 'LINK / path/', 'LINK /path/ x', 'PUT /path/x {}' ],
       [ 'GET /path/x', 'LIST /', 'LIST /path/', 'LINK /path/ x', 'LINK / path/', 'PUT /path/x {}' ],
@@ -133,7 +133,7 @@ describe('Graph', () => {
       let n4 = graph.add([n1, n3], 4)
       let n6 = graph.add([n0, n1], 6)
 
-      orders = graph.orderings()
+      orders = Array.from(graph.orderings())
     })
 
     it('returns a unique set of orderings', () => {
