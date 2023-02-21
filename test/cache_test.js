@@ -23,6 +23,12 @@ describe('Cache', () => {
     assert.deepEqual(cache.read('x'), { a: 51 })
   })
 
+  it('caches a read that does not return anything', () => {
+    assert.equal(cache.read('x'), null)
+    assert.deepEqual(store.write('x', null, { a: 51 }), { ok: true, rev: 1 })
+    assert.equal(cache.read('x'), null)
+  })
+
   it('writes a value to the store', () => {
     assert.deepEqual(cache.write('x', { a: 51 }), { ok: true })
 
