@@ -1,0 +1,389 @@
+
+> @vault-db/model-checker@0.0.0 start
+> node index.js
+
+========================================================================
+
+Configuration:
+    - update = 'get_before_put'
+
+Scenario: update/update conflict
+    checked executions: 831,600
+    result: PASS
+
+Scenario: update/update conflict (missing)
+    checked executions: 831,600
+    result: PASS
+
+Scenario: update/delete conflict
+    checked executions: 64
+    result: FAIL
+    errors:
+        - dir "/path/" does not include name "x", required by doc "/path/x"
+    state:
+        '/' => { rev: 2, value: [ 'path/' ] }
+        '/path/' => { rev: 3, value: [] }
+        '/path/x' => { rev: 3, value: { x: 'A' } }
+    execution:
+        A.list('/')
+        A.link('/', 'path/')
+        A.list('/path/')
+        A.link('/path/', 'x')
+        B.list('/')
+        B.list('/path/')
+        B.get('/path/x')
+        B.rm('/path/x')
+        A.get('/path/x')
+        A.put('/path/x', [Function (anonymous)])
+    ==> B.unlink('/path/', 'x')
+        B.unlink('/', 'path/')
+
+Scenario: update/delete conflict (missing)
+    checked executions: 166,320
+    result: PASS
+
+Scenario: delete, create sibling
+    checked executions: 37,213
+    result: FAIL
+    errors:
+        - dir "/" does not include name "path/", required by doc "/path/y"
+    state:
+        '/' => { rev: 3, value: [] }
+        '/path/' => { rev: 3, value: [ 'y' ] }
+        '/path/x' => { rev: 2, value: null }
+        '/path/y' => { rev: 1, value: { y: 1 } }
+    execution:
+        A.list('/path/')
+        A.get('/path/x')
+        B.list('/')
+        B.link('/', 'path/')
+        A.list('/')
+        A.rm('/path/x')
+        A.unlink('/path/', 'x')
+        A.unlink('/', 'path/')
+        B.list('/path/')
+        B.link('/path/', 'y')
+        B.get('/path/y')
+    ==> B.put('/path/y', [Function (anonymous)])
+
+Scenario: delete, create in parent
+    checked executions: 385,993
+    result: FAIL
+    errors:
+        - dir "/" does not include name "path/", required by doc "/path/y"
+    state:
+        '/' => { rev: 3, value: [] }
+        '/path/' => { rev: 3, value: [ 'y' ] }
+        '/path/to/' => { rev: 2, value: [] }
+        '/path/to/x' => { rev: 2, value: null }
+        '/path/y' => { rev: 1, value: { y: 1 } }
+    execution:
+        A.list('/path/')
+        A.list('/path/to/')
+        A.get('/path/to/x')
+        B.list('/')
+        B.link('/', 'path/')
+        A.list('/')
+        A.rm('/path/to/x')
+        A.unlink('/path/to/', 'x')
+        A.unlink('/path/', 'to/')
+        A.unlink('/', 'path/')
+        B.list('/path/')
+        B.link('/path/', 'y')
+        B.get('/path/y')
+    ==> B.put('/path/y', [Function (anonymous)])
+
+Scenario: delete, create in grandparent
+    checked executions: 35,640
+    result: PASS
+
+Scenario: delete, create in child
+    checked executions: 2,059,021
+    result: FAIL
+    errors:
+        - dir "/" does not include name "path/", required by doc "/path/to/y"
+    state:
+        '/' => { rev: 3, value: [] }
+        '/path/' => { rev: 3, value: [ 'to/' ] }
+        '/path/to/' => { rev: 1, value: [ 'y' ] }
+        '/path/to/y' => { rev: 1, value: { y: 1 } }
+        '/path/x' => { rev: 2, value: null }
+    execution:
+        A.list('/path/')
+        A.get('/path/x')
+        B.list('/')
+        B.link('/', 'path/')
+        A.list('/')
+        A.rm('/path/x')
+        A.unlink('/path/', 'x')
+        A.unlink('/', 'path/')
+        B.list('/path/')
+        B.link('/path/', 'to/')
+        B.list('/path/to/')
+        B.link('/path/to/', 'y')
+        B.get('/path/to/y')
+    ==> B.put('/path/to/y', [Function (anonymous)])
+
+Scenario: delete, create in grandchild
+    checked executions: 623,700
+    result: PASS
+
+Scenario: delete, update sibling
+    checked executions: 166,320
+    result: PASS
+
+Scenario: delete, update in parent
+    checked executions: 2,162,160
+    result: PASS
+
+Scenario: delete, update in grandparent
+    checked executions: 35,640
+    result: PASS
+
+Scenario: delete, update in child
+    checked executions: 11,351,340
+    result: PASS
+
+Scenario: delete, update in grandchild
+    checked executions: 623,700
+    result: PASS
+
+========================================================================
+
+Configuration:
+    - remove = 'unlink_parallel'
+
+Scenario: update/update conflict
+    checked executions: 133,056
+    result: PASS
+
+Scenario: update/update conflict (missing)
+    checked executions: 133,056
+    result: PASS
+
+Scenario: update/delete conflict
+    checked executions: 133,056
+    result: PASS
+
+Scenario: update/delete conflict (missing)
+    checked executions: 133,056
+    result: PASS
+
+Scenario: delete, create sibling
+    checked executions: 29,902
+    result: FAIL
+    errors:
+        - dir "/" does not include name "path/", required by doc "/path/y"
+    state:
+        '/' => { rev: 3, value: [] }
+        '/path/' => { rev: 2, value: [ 'x', 'y' ] }
+        '/path/x' => { rev: 2, value: null }
+        '/path/y' => { rev: 1, value: { y: 1 } }
+    execution:
+        A.list('/path/')
+        A.get('/path/x')
+        B.list('/')
+        B.list('/path/')
+        B.get('/path/y')
+        B.link('/', 'path/')
+        A.list('/')
+        A.rm('/path/x')
+        A.unlink('/', 'path/')
+        B.link('/path/', 'y')
+        A.unlink('/path/', 'x')
+    ==> B.put('/path/y', [Function (anonymous)])
+
+Scenario: delete, create in parent
+    checked executions: 927,041
+    result: FAIL
+    errors:
+        - dir "/" does not include name "path/", required by doc "/path/y"
+    state:
+        '/' => { rev: 3, value: [] }
+        '/path/' => { rev: 2, value: [ 'to/', 'y' ] }
+        '/path/to/' => { rev: 2, value: [] }
+        '/path/to/x' => { rev: 2, value: null }
+        '/path/y' => { rev: 1, value: { y: 1 } }
+    execution:
+        A.list('/path/')
+        A.list('/path/to/')
+        A.get('/path/to/x')
+        B.list('/')
+        B.list('/path/')
+        B.get('/path/y')
+        B.link('/', 'path/')
+        A.list('/')
+        A.rm('/path/to/x')
+        A.unlink('/', 'path/')
+        A.unlink('/path/to/', 'x')
+        B.link('/path/', 'y')
+        A.unlink('/path/', 'to/')
+    ==> B.put('/path/y', [Function (anonymous)])
+
+Scenario: delete, create in grandparent
+    checked executions: 142,560
+    result: PASS
+
+Scenario: delete, create in child
+    checked executions: 943,143
+    result: FAIL
+    errors:
+        - dir "/" does not include name "path/", required by doc "/path/to/y"
+    state:
+        '/' => { rev: 3, value: [] }
+        '/path/' => { rev: 2, value: [ 'to/', 'x' ] }
+        '/path/to/' => { rev: 1, value: [ 'y' ] }
+        '/path/to/y' => { rev: 1, value: { y: 1 } }
+        '/path/x' => { rev: 2, value: null }
+    execution:
+        A.list('/path/')
+        A.get('/path/x')
+        B.list('/')
+        B.list('/path/')
+        B.list('/path/to/')
+        B.get('/path/to/y')
+        B.link('/', 'path/')
+        A.list('/')
+        A.rm('/path/x')
+        A.unlink('/', 'path/')
+        B.link('/path/', 'to/')
+        A.unlink('/path/', 'x')
+        B.link('/path/to/', 'y')
+    ==> B.put('/path/to/y', [Function (anonymous)])
+
+Scenario: delete, create in grandchild
+    checked executions: 142,560
+    result: PASS
+
+Scenario: delete, update sibling
+    checked executions: 133,056
+    result: PASS
+
+Scenario: delete, update in parent
+    checked executions: 5,189,184
+    result: PASS
+
+Scenario: delete, update in grandparent
+    checked executions: 142,560
+    result: PASS
+
+Scenario: delete, update in child
+    checked executions: 5,189,184
+    result: PASS
+
+Scenario: delete, update in grandchild
+    checked executions: 142,560
+    result: PASS
+
+========================================================================
+
+Configuration:
+
+Scenario: update/update conflict
+    checked executions: 133,056
+    result: PASS
+
+Scenario: update/update conflict (missing)
+    checked executions: 133,056
+    result: PASS
+
+Scenario: update/delete conflict
+    checked executions: 66,528
+    result: PASS
+
+Scenario: update/delete conflict (missing)
+    checked executions: 66,528
+    result: PASS
+
+Scenario: delete, create sibling
+    checked executions: 66,528
+    result: PASS
+
+Scenario: delete, create in parent
+    checked executions: 864,864
+    result: PASS
+
+Scenario: delete, create in grandparent
+    checked executions: 23,760
+    result: PASS
+
+Scenario: delete, create in child
+    checked executions: 2,594,592
+    result: PASS
+
+Scenario: delete, create in grandchild
+    checked executions: 142,560
+    result: PASS
+
+Scenario: delete, update sibling
+    checked executions: 66,528
+    result: PASS
+
+Scenario: delete, update in parent
+    checked executions: 864,864
+    result: PASS
+
+Scenario: delete, update in grandparent
+    checked executions: 23,760
+    result: PASS
+
+Scenario: delete, update in child
+    checked executions: 2,594,592
+    result: PASS
+
+Scenario: delete, update in grandchild
+    checked executions: 142,560
+    result: PASS
+
+========================================================================
+SUMMARY
+========================================================================
+
+Configuration: { update: 'get_before_put' }
+    - PASS (831,600): update/update conflict
+    - PASS (831,600): update/update conflict (missing)
+    - FAIL (64): update/delete conflict
+    - PASS (166,320): update/delete conflict (missing)
+    - FAIL (37,213): delete, create sibling
+    - FAIL (385,993): delete, create in parent
+    - PASS (35,640): delete, create in grandparent
+    - FAIL (2,059,021): delete, create in child
+    - PASS (623,700): delete, create in grandchild
+    - PASS (166,320): delete, update sibling
+    - PASS (2,162,160): delete, update in parent
+    - PASS (35,640): delete, update in grandparent
+    - PASS (11,351,340): delete, update in child
+    - PASS (623,700): delete, update in grandchild
+
+Configuration: { remove: 'unlink_parallel' }
+    - PASS (133,056): update/update conflict
+    - PASS (133,056): update/update conflict (missing)
+    - PASS (133,056): update/delete conflict
+    - PASS (133,056): update/delete conflict (missing)
+    - FAIL (29,902): delete, create sibling
+    - FAIL (927,041): delete, create in parent
+    - PASS (142,560): delete, create in grandparent
+    - FAIL (943,143): delete, create in child
+    - PASS (142,560): delete, create in grandchild
+    - PASS (133,056): delete, update sibling
+    - PASS (5,189,184): delete, update in parent
+    - PASS (142,560): delete, update in grandparent
+    - PASS (5,189,184): delete, update in child
+    - PASS (142,560): delete, update in grandchild
+
+Configuration: {}
+    - PASS (133,056): update/update conflict
+    - PASS (133,056): update/update conflict (missing)
+    - PASS (66,528): update/delete conflict
+    - PASS (66,528): update/delete conflict (missing)
+    - PASS (66,528): delete, create sibling
+    - PASS (864,864): delete, create in parent
+    - PASS (23,760): delete, create in grandparent
+    - PASS (2,594,592): delete, create in child
+    - PASS (142,560): delete, create in grandchild
+    - PASS (66,528): delete, update sibling
+    - PASS (864,864): delete, update in parent
+    - PASS (23,760): delete, update in grandparent
+    - PASS (2,594,592): delete, update in child
+    - PASS (142,560): delete, update in grandchild
+
