@@ -83,6 +83,29 @@ describe('Actor', () => {
     assert.deepEqual(rec, { rev: 3, value: ['a.txt', 'to/', 'x.json', 'z.txt'] })
   })
 
+  it('creates links that already exist', () => {
+    actor.link('/path/', 'x.json')
+
+    let rec = store.read('/path/')
+    assert.deepEqual(rec, { rev: 2, value: ['to/', 'x.json'] })
+  })
+
+  it('can skip creating links that already exist', () => {
+    let skipper = new Actor(store, { skip_links: true })
+    skipper.link('/path/', 'x.json')
+
+    let rec = store.read('/path/')
+    assert.deepEqual(rec, { rev: 1, value: ['to/', 'x.json'] })
+  })
+
+  it('does not skip creating links that do not already exist', () => {
+    let skipper = new Actor(store, { skip_links: true })
+    skipper.link('/path/', 'a.json')
+
+    let rec = store.read('/path/')
+    assert.deepEqual(rec, { rev: 2, value: ['a.json', 'to/', 'x.json'] })
+  })
+
   it('removes a document', () => {
     actor.rm(x_path)
 

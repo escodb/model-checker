@@ -7,6 +7,7 @@ let runner = new Runner()
 runner.configs([
   { update: 'get_before_put' },
   { remove: 'unlink_parallel' },
+  { skip_links: true },
   {}
 ])
 
