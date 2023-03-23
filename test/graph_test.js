@@ -147,15 +147,17 @@ describe('Graph', () => {
       let pairs = [
         [0, 3], [0, 7],
         [1, 5], [1, 7],
-        [2, 1], [2, 5], [2,7],
+        [2, 1], [2, 5], [2, 7],
         [4, 1], [4, 3], [4, 5], [4, 7],
         [6, 0], [6, 1], [6, 3], [6, 5], [6, 7]
       ]
-      for (let [a, b] of pairs) {
-        assert(
-          !orders.some((order) => order.indexOf(a) < order.indexOf(b)),
-          `node ${a} appears before node ${b}`
-        )
+      for (let order of orders) {
+        for (let [a, b] of pairs) {
+          assert(
+            order.indexOf(a) > order.indexOf(b),
+            `node ${a} appears before node ${b}`
+          )
+        }
       }
     })
 
