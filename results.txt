@@ -1,5 +1,5 @@
 
-> @vault-db/model-checker@0.0.0 start
+> @escodb/model-checker@0.0.0 start
 > node index.js
 
 ========================================================================

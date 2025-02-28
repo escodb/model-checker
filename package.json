@@ -1,8 +1,8 @@
 {
-  "name": "@vault-db/model-checker",
+  "name": "@escodb/model-checker",
   "version": "0.0.0",
-  "description": "Automated model checking for VaultDB execution",
-  "homepage": "https://github.com/vault-db/model-checker",
+  "description": "Automated model checking for EscoDB execution",
+  "homepage": "https://github.com/escodb/model-checker",
   "author": "James Coglan <jcoglan@gmail.com>",
   "license": "MPL-2.0",
   "private": true,
